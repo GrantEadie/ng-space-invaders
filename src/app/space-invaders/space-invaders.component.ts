@@ -3,7 +3,6 @@ import * as p5 from 'p5';
 import Ship from './js/Ship';
 import Enemy from './js/Enemy';
 import Lazer from './js/Lazer';
-import Barrier from './js/Barrier';
 import BarrierBlock from './js/BarrierBlock'
 import GameDrawing from './js/GameDrawing';
 
@@ -27,44 +26,49 @@ export class SpaceInvadersComponent implements OnInit {
     let explosion: any = [];
     let enemyShot: any = [];
     let mode: number;
-    let barrier: any = [];
-    let barriers: any = [];
+    let allBarriers: any = [];
     let gameDrawing = new GameDrawing();
 
-    const loadBarriers = function (e: any) {
+    const loadBarriers = function (e: any, placement: number) {
+      let barrier: any = [];
       for (let i = 0; i < 10; i++) {
-        barrier[i] = new BarrierBlock((e.width / 4) - (i*10), e.height - 200, 10, 10)
+        barrier[i] = new BarrierBlock(((e.width / 4) + placement) - (i * 10), e.height - 200, 10, 10)
       }
       for (let j = 10; j < 20; j++) {
-        barrier[j] = new BarrierBlock((e.width / 4) - ((j-10)*10), e.height -211, 10, 10)
+        barrier[j] = new BarrierBlock(((e.width / 4) + placement) - ((j - 10) * 10), e.height - 211, 10, 10)
       }
       for (let j = 20; j < 30; j++) {
-        barrier[j] = new BarrierBlock((e.width / 4) - ((j-20)*10), e.height -222, 10, 10)
+        barrier[j] = new BarrierBlock(((e.width / 4) + placement) - ((j - 20) * 10), e.height - 222, 10, 10)
       }
       for (let j = 30; j < 40; j++) {
-        barrier[j] = new BarrierBlock((e.width / 4) - ((j-30)*10), e.height -233, 10, 10)
+        barrier[j] = new BarrierBlock(((e.width / 4) + placement) - ((j - 30) * 10), e.height - 233, 10, 10)
       }
       for (let j = 40; j < 50; j++) {
-        barrier[j] = new BarrierBlock((e.width / 4) - ((j-40)*10), e.height -244, 10, 10)
+        barrier[j] = new BarrierBlock(((e.width / 4) + placement) - ((j - 40) * 10), e.height - 244, 10, 10)
       }
+      return barrier
     }
 
-    const loadEnemies = function (e: any) {
-      for (let i = 0; i < 11; i++) {
-        enemies[i] = new Enemy(e, i * 30 + 30, 40, 6);
+    const loadEnemies = function (e: any, rows: number, amount: number) {
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < amount; i++) {
+          enemies[i + (j*amount)] = new Enemy(e, i * (30+Math.pow(j, 1.5)) + 30, 40 + (30*Math.pow(j, 1.3)), 6 + (3*j));
+        }
       }
-      for (let i = 0; i < 11; i++) {
-        enemies[i + 11] = new Enemy(e, i * 30 + 30, 60, 9);
-      }
-      for (let i = 0; i < 11; i++) {
-        enemies[i + 22] = new Enemy(e, i * 32 + 22, 90, 12);
-      }
+      // for (let i = 0; i < 11; i++) {
+      //   enemies[i + 11] = new Enemy(e, i * 30 + 30, 60, 9);
+      // }
+      // for (let i = 0; i < 11; i++) {
+      //   enemies[i + 22] = new Enemy(e, i * 32 + 22, 90, 12);
+      // }
     }
 
     const loadGame = function (e: any) {
       ship = new Ship(e);
-      loadEnemies(e);
-      loadBarriers(e)
+      loadEnemies(e, 5, 12);
+      for (let i = 0; i < 4; i++) {
+        allBarriers[i] = loadBarriers(e, i * (e.width / 5))
+      }
     }
 
     const resetGame = function () {
@@ -95,10 +99,10 @@ export class SpaceInvadersComponent implements OnInit {
           if (gameOver) {
             gameDrawing.gameOver(e)
           } else {
-            gameDrawing.drawMenu(e, barrier)
+            gameDrawing.drawMenu(e, allBarriers)
           }
         } else {
-          gameDrawing.drawGame(e, ship, enemies, explosion, enemyShot, lazers, barrier)
+          gameDrawing.drawGame(e, ship, enemies, explosion, enemyShot, lazers, allBarriers)
           if (ship.gameOver) {
             gameOver = true;
             DISPLAY_MENU = true;
@@ -128,7 +132,7 @@ export class SpaceInvadersComponent implements OnInit {
 
       e.keyPressed = () => {
         if (e.key === ' ') {
-          if (e.frameCount - ship.lastLazerFiredTimeStamp > 15) {
+          if (e.frameCount - ship.lastLazerFiredTimeStamp > 7) {
             let lazer: any = new Lazer(e, ship.x + 20, e.height - 40);
             lazers.push(lazer)
           }

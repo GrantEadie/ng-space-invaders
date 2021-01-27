@@ -11,7 +11,7 @@ const GameDrawing = function () {
     e.pop();
   };
 
-  this.drawMenu = function (e, barriers) {
+  this.drawMenu = function (e, barrier) {
     e.background(0);
     e.noStroke();
     e.fill(255);
@@ -22,8 +22,10 @@ const GameDrawing = function () {
 
     e.text(msgPress, e.width / 2, e.height / 2);
 
-    for (let i = 0; i < barriers.length; i++) {
-      barriers[i].show(e);
+    for (let i = 0; i < barrier.length; i++) {
+      for (let j = 0; j < barrier[i].length; j++) {
+        barrier[i][j].show(e);
+      }
     }
 
     // e.text(msgOption, ((_cols/2)*_scl), ((_rows/2)*_scl));
@@ -81,10 +83,10 @@ const GameDrawing = function () {
 
     // Enemy Guns
     for (let i = 0; i < enemies.length; i++) {
-      let randomEnemyShot = e.round(e.random(0, enemies.length));
+      // let randomEnemyShot = e.round(e.random(0, enemies.length));
 
       if (e.abs(enemies[i].x - ship.x - 20) < 40) {
-        if (e.frameCount % (randomEnemyShot * 10) === 0) {
+        if (e.frameCount % e.round(e.random(150, 400)) === 0) {
           let shot = new EnemyShot(e, enemies[i].x, enemies[i].y);
           enemyShot.push(shot);
         }
@@ -99,21 +101,26 @@ const GameDrawing = function () {
       }
       if (enemyShot[i].hits(e, ship) && !ship.resetInvinsible) {
         enemyShot.splice(0, enemyShot.length);
-        explosion.push(new Explosion(e, ship.x + 20, ship.y, e.frameCount));
+        explosion.push(new Explosion(e, ship.x + 20, ship.y, e.frameCount, 30));
         ship.die(e);
         break;
       }
-      for (let j = barrier.length - 1; j >= 0; j--) {
-        if (enemyShot[i].hitsBarrier(e, barrier[j])) {
-          barrier.splice(j, 1);
-          enemyShot.splice(i, 1);
-          break
+      for (let j = 0; j < barrier.length; j++) {
+        for (let k = 0; k < barrier[j].length; k++) {
+          if (enemyShot[i].hitsBarrier(e, barrier[j][k])) {
+            barrier[j].splice(k, 1);
+            enemyShot[i].die(e)
+            // enemyShot.splice(i, 1);
+            break;
+          }
         }
       }
     }
 
     for (let i = 0; i < barrier.length; i++) {
-      barrier[i].show(e);
+      for (let j = 0; j < barrier[i].length; j++) {
+        barrier[i][j].show(e);
+      }
     }
 
     // Lazer show and hit
@@ -128,7 +135,26 @@ const GameDrawing = function () {
           enemies[j].die(e);
           lazers[i].die(e);
           explosion.push(
-            new Explosion(e, enemies[j].x, enemies[j].y, e.frameCount)
+            new Explosion(e, enemies[j].x, enemies[j].y, e.frameCount, 15)
+          );
+        }
+      }
+      for (let j = 0; j < barrier.length; j++) {
+        for (let k = 0; k < barrier[j].length; k++) {
+          if (lazers[i].hitsBarrier(e, barrier[j][k])) {
+            barrier[j].splice(k, 1);
+            lazers[i].die(e)
+            break;
+          }
+        }
+      }
+      // Enemy Shots hit Ship Lazer 
+      for (let j = 0; j < enemyShot.length; j++) {
+        if (lazers[i].hitsShot(e, enemyShot[j])) {
+          enemyShot[j].die(e)
+          lazers[i].die(e)
+          explosion.push(
+            new Explosion(e, enemyShot[j].x, enemyShot[j].y, e.frameCount, 7)
           );
         }
       }
