@@ -25,7 +25,6 @@ export class SpaceInvadersComponent implements OnInit {
     let lazers: any = [];
     let explosion: any = [];
     let enemyShot: any = [];
-    let mode: number;
     let allBarriers: any = [];
     let gameDrawing = new GameDrawing();
 
@@ -55,12 +54,6 @@ export class SpaceInvadersComponent implements OnInit {
           enemies[i + (j*amount)] = new Enemy(e, i * (30+Math.pow(j, 1.5)) + 30, 40 + (30*Math.pow(j, 1.3)), 6 + (3*j));
         }
       }
-      // for (let i = 0; i < 11; i++) {
-      //   enemies[i + 11] = new Enemy(e, i * 30 + 30, 60, 9);
-      // }
-      // for (let i = 0; i < 11; i++) {
-      //   enemies[i + 22] = new Enemy(e, i * 32 + 22, 90, 12);
-      // }
     }
 
     const loadGame = function (e: any) {

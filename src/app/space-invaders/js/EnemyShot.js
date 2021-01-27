@@ -3,11 +3,19 @@ const EnemyShot = function(e, x, y) {
   this.y = y;
   this.r = 4;
   this.toDelete = false;
+  this.secondaryRGB = [255, 255, 0]
 
   this.show = function(e) {
     e.noStroke();
     e.fill(255, 255, 0)
     e.ellipse(this.x, this.y, this.r, this.r);
+    e.push();
+    let size = this.r * (e.random(1, 6))
+    e.stroke(`rgba(${this.secondaryRGB[0]},${this.secondaryRGB[1]},${this.secondaryRGB[2]},.3) `);
+    e.strokeWeight(size);
+    e.noFill()
+    e.ellipse(this.x, this.y, this.r/2, this.r*3);
+    e.pop();
   }
 
   this.hits = function(e, ship) {

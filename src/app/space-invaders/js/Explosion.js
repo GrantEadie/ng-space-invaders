@@ -4,13 +4,14 @@ const Explosion = function(e, x, y, startCount, size) {
   this.r = 4;
   this.startCount = startCount;
   this.size = size;
+  this.secondaryRGB = [0,0,0]
 
   this.show = function(e) {
     e.push();
     e.translate(this.x, this.y);
     e.noFill();
     e.stroke(255);
-    e.strokeWeight(1);
+    // e.strokeWeight(1);
     if(e.frameCount%3 === 0) {
       for(let i = 0; i < 10; i++){
         e.line(e.floor(e.random(0,size/2)), 0, e.floor(e.random(size/2,size*2)), 0);

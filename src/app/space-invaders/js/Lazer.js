@@ -3,7 +3,7 @@ const Lazer = function(e, x, y) {
   this.y = y;
   this.r = 4;
   this.toDelete = false;
-  this.secondaryRGB = '255, 0, 0'
+  this.secondaryRGB = [255, 0, 0]
 
 
   this.show = function(e) {
@@ -13,10 +13,11 @@ const Lazer = function(e, x, y) {
     e.rect(this.x, this.y, this.r/4, this.r*3)
     e.pop()
     e.push();
-    var size = this.r * (e.random(10, 20))
+    let size = this.r * (e.random(1, 6))
     e.stroke(`rgba(${this.secondaryRGB[0]},${this.secondaryRGB[1]},${this.secondaryRGB[2]},.3) `);
     e.strokeWeight(size);
-    e.ellipse(this.x, this.y, this.r/2, this.r*3);
+    e.noFill()
+    e.ellipse(this.x, this.y+20, this.r/2, this.r*3);
     e.pop();
   }
 
