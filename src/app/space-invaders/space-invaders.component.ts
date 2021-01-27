@@ -4,7 +4,8 @@ import Ship from './js/Ship';
 import Enemy from './js/Enemy';
 import Lazer from './js/Lazer';
 import Barrier from './js/Barrier';
-import Explosion from './js/Explosion'
+import BarrierBlock from './js/BarrierBlock'
+import GameDrawing from './js/GameDrawing';
 
 @Component({
   selector: 'app-space-invaders',
@@ -17,11 +18,63 @@ export class SpaceInvadersComponent implements OnInit {
 
   ngOnInit(): void {
 
+
+    let DISPLAY_MENU = true;
+    let gameOver = false;
     let ship: any;
-    let barriers: any = [];
     let enemies: any = [];
     let lazers: any = [];
     let explosion: any = [];
+    let enemyShot: any = [];
+    let mode: number;
+    let barrier: any = [];
+    let barriers: any = [];
+    let gameDrawing = new GameDrawing();
+
+    const loadBarriers = function (e: any) {
+      for (let i = 0; i < 10; i++) {
+        barrier[i] = new BarrierBlock((e.width / 4) - (i*10), e.height - 200, 10, 10)
+      }
+      for (let j = 10; j < 20; j++) {
+        barrier[j] = new BarrierBlock((e.width / 4) - ((j-10)*10), e.height -211, 10, 10)
+      }
+      for (let j = 20; j < 30; j++) {
+        barrier[j] = new BarrierBlock((e.width / 4) - ((j-20)*10), e.height -222, 10, 10)
+      }
+      for (let j = 30; j < 40; j++) {
+        barrier[j] = new BarrierBlock((e.width / 4) - ((j-30)*10), e.height -233, 10, 10)
+      }
+      for (let j = 40; j < 50; j++) {
+        barrier[j] = new BarrierBlock((e.width / 4) - ((j-40)*10), e.height -244, 10, 10)
+      }
+    }
+
+    const loadEnemies = function (e: any) {
+      for (let i = 0; i < 11; i++) {
+        enemies[i] = new Enemy(e, i * 30 + 30, 40, 6);
+      }
+      for (let i = 0; i < 11; i++) {
+        enemies[i + 11] = new Enemy(e, i * 30 + 30, 60, 9);
+      }
+      for (let i = 0; i < 11; i++) {
+        enemies[i + 22] = new Enemy(e, i * 32 + 22, 90, 12);
+      }
+    }
+
+    const loadGame = function (e: any) {
+      ship = new Ship(e);
+      loadEnemies(e);
+      loadBarriers(e)
+    }
+
+    const resetGame = function () {
+      gameDrawing = new GameDrawing();
+      enemyShot = [];
+      explosion = [];
+      lazers = [];
+      ship = null;
+    }
+
 
     const sketch = (e: any) => {
 
@@ -30,88 +83,46 @@ export class SpaceInvadersComponent implements OnInit {
       }
 
       e.setup = () => {
-        e.createCanvas(600, 400);
+        e.createCanvas(1000, 1000);
         e.noSmooth();
-        e.frameRate(60)
-        ship = new Ship(e);
-        for (let i = 0; i < 11; i++) {
-          enemies[i] = new Enemy(e, i * 30 + 30, 60, 6);
-        }
-        for (let i = 0; i < 11; i++) {
-          enemies[i + 11] = new Enemy(e, i * 30 + 30, 90, 9);
-        }
-        for (let i = 0; i < 11; i++) {
-          enemies[i + 22] = new Enemy(e, i * 32 + 22, 125, 12);
-        }
+        e.frameRate(60);
+        loadGame(e);
       };
 
       e.draw = () => {
-        e.background(0);
-        ship.show(e);
-        ship.move(e);
 
-        // Move ship
-        if (ship.x < 0) {
-          ship.x += 5;
-        } else if (ship.x > e.width) {
-          ship.x -= 5
-        }
-
-        // Lazer show and hit
-        for (let i = 0; i < lazers.length; i++) {
-          lazers[i].show(e);
-          lazers[i].move(e);
-          if (lazers[i].y <= 0) {
-            lazers[i].die(e);
-          }
-          for (let j = 0; j < enemies.length; j++) {
-            if (lazers[i].hits(e, enemies[j])) {
-              enemies[j].die(e);
-              lazers[i].die(e);
-              explosion.push(new Explosion(e, enemies[j].x, enemies[j].y, e.frameCount))
-            }
-          }
-        }
-
-        let edge: boolean = false;
-
-        for (let i = 0; i < explosion.length; i++) {
-          if (e.frameCount < explosion[i].startCount + 30) {
-            explosion[i].show(e)
+        if (DISPLAY_MENU) {
+          if (gameOver) {
+            gameDrawing.gameOver(e)
           } else {
-            explosion.slice(i, 1)
+            gameDrawing.drawMenu(e, barrier)
           }
-        }
-
-        for (let i = 0; i < enemies.length; i++) {
-          enemies[i].show(e);
-          enemies[i].move(e, 21);
-          if (enemies[i].x > e.width - 30 || enemies[i].x < 30) {
-            edge = true;
-          }
-        }
-        if (edge) {
-          for (let j = 0; j < enemies.length; j++) {
-            enemies[j].shiftDown(e);
-          }
-        }
-
-        for (let i = enemies.length - 1; i >= 0; i--) {
-          if (enemies[i].toDelete) {
-            enemies.splice(i, 1);
-          }
-        }
-
-        for (let i = lazers.length - 1; i >= 0; i--) {
-          if (lazers[i].toDelete) {
-            lazers.splice(i, 1);
+        } else {
+          gameDrawing.drawGame(e, ship, enemies, explosion, enemyShot, lazers, barrier)
+          if (ship.gameOver) {
+            gameOver = true;
+            DISPLAY_MENU = true;
+            resetGame();
+            loadGame(e);
           }
         }
       };
 
+
       e.keyReleased = () => {
-        if (e.key != ' ') {
-          ship.setDir(0);
+        if (DISPLAY_MENU && !gameOver) {
+          if (e.key === 'Enter') {
+            DISPLAY_MENU = false;
+          }
+        } else if (gameOver) {
+          if (e.key === 'Enter') {
+            gameOver = false;
+          }
+        } else {
+          if (e.key != ' ') {
+            ship.setDir(0);
+          }
+
         }
       }
 

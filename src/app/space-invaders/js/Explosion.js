@@ -20,15 +20,6 @@ const Explosion = function(e, x, y, startCount) {
     e.pop();
   }
 
-  this.hits = function(e, enemy) {
-    let d = e.dist(this.x, this.y, enemy.x, enemy.y);
-    if (d < this.r + enemy.r) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
 }
 
 export default Explosion

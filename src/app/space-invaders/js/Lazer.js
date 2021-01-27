@@ -5,9 +5,11 @@ const Lazer = function(e, x, y) {
   this.toDelete = false;
 
   this.show = function(e) {
+    e.push()
     e.noStroke();
     e.fill(255, 0, 0)
     e.rect(this.x, this.y, this.r/4, this.r*3)
+    e.pop()
   }
 
   this.hits = function(e, enemy) {
