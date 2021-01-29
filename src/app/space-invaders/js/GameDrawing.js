@@ -21,25 +21,21 @@ const GameDrawing = function () {
     let msgPress = "PRESS ENTER TO START";
 
     e.text(msgPress, e.width / 2, e.height / 2);
-
-    for (let i = 0; i < barrier.length; i++) {
-      for (let j = 0; j < barrier[i].length; j++) {
-        barrier[i][j].show(e);
-      }
-    }
-
-    // e.text(msgOption, ((_cols/2)*_scl), ((_rows/2)*_scl));
   };
 
   this.gameOver = function (e) {
+    push()
     e.background(255);
     e.noStroke();
+    e.fill(0)
     e.textAlign(e.CENTER);
     e.textSize(15);
 
     let msgPress = "GAME OVER";
 
     e.text(msgPress, e.width / 2, e.height / 2);
+    e.pop()
+    
   };
 
   this.drawGame = function (

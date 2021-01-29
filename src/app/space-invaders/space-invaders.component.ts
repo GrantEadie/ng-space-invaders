@@ -51,7 +51,13 @@ export class SpaceInvadersComponent implements OnInit {
     const loadEnemies = function (e: any, rows: number, amount: number) {
       for (let j = 0; j < rows; j++) {
         for (let i = 0; i < amount; i++) {
-          enemies[i + (j*amount)] = new Enemy(e, i * (30+Math.pow(j, 1.5)) + 30, 40 + (30*Math.pow(j, 1.3)), 6 + (3*j));
+          if (j % 2 === 0) {
+            // first row
+            enemies[i + (j*amount)] = new Enemy(e, (i*40) + 30, 40 + (60*j), 6, j);
+          } else {
+            // second row
+            enemies[i + (j*amount)] = new Enemy(e, (i*40) + 20, 40 + (60*j), 6, j);
+          }
         }
       }
     }
@@ -125,11 +131,11 @@ export class SpaceInvadersComponent implements OnInit {
 
       e.keyPressed = () => {
         if (e.key === ' ') {
-          if (e.frameCount - ship.lastLazerFiredTimeStamp > 7) {
+          if (e.frameCount - ship.lastLazerFiredTimeStamp > 21) {
             let lazer: any = new Lazer(e, ship.x + 20, e.height - 40);
             lazers.push(lazer)
+            ship.lastLazerFiredTimeStamp = e.frameCount;
           }
-          ship.lastLazerFiredTimeStamp = e.frameCount;
         }
 
         if (e.keyCode === e.RIGHT_ARROW && ship.x < e.width) {
