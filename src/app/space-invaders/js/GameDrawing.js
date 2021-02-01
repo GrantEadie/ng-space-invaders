@@ -24,7 +24,7 @@ const GameDrawing = function () {
   };
 
   this.gameOver = function (e) {
-    push()
+    e.push()
     e.background(255);
     e.noStroke();
     e.fill(0)
@@ -45,7 +45,8 @@ const GameDrawing = function () {
     explosion,
     enemyShot,
     lazers,
-    barrier
+    barrier,
+    startingEnemies
   ) {
     e.background(0);
     // create ship
@@ -81,8 +82,9 @@ const GameDrawing = function () {
     for (let i = 0; i < enemies.length; i++) {
       // let randomEnemyShot = e.round(e.random(0, enemies.length));
 
-      if (e.abs(enemies[i].x - ship.x - 20) < 40) {
-        if (e.frameCount % e.round(e.random(150, 400)) === 0) {
+      let difficultyFrequency = enemies.length
+      if (e.abs(ship.x - enemies[i].x) < 40) {
+        if (e.frameCount % e.round(e.random((difficultyFrequency), 50 + (difficultyFrequency*10))) === 0) {
           let shot = new EnemyShot(e, enemies[i].x, enemies[i].y);
           enemyShot.push(shot);
         }
@@ -165,21 +167,15 @@ const GameDrawing = function () {
     }
 
     // Show and move Enemies
+
     for (let i = 0; i < enemies.length; i++) {
       enemies[i].show(e);
-      enemies[i].move(e, 25);
-      if (enemies[i].x > e.width || enemies[i].x < 10) {
-        edge = true;
+      enemies[i].move(e, enemies.length, startingEnemies);
+      if (enemies[i].x >= e.width || enemies[i].x <= 10) {
+        let enemyDifficulty = startingEnemies - enemies.length;
+        enemies[i].shiftDown(enemyDifficulty)
       }
     }
-    //Move enemies down if on edge
-    if (edge) {
-      for (let j = 0; j < enemies.length; j++) {
-        enemies[j].shiftDown(e);
-      }
-      edge = false;
-    }
-    //Remove enemy from the array if hit
     for (let i = enemies.length - 1; i >= 0; i--) {
       if (enemies[i].toDelete) {
         enemies.splice(i, 1);

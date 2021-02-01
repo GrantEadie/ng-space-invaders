@@ -1,9 +1,10 @@
 const Enemy = function (e, x, y, r, shape) {
   this.redShadow = "rgba(255, 0, 0, .6)";
 
-  this.shapeArray = ["circle", "triangle", "circle", "square"];
+  this.shapeArray = ["circle", "triangle", "circle", "square", "triangle"];
   this.shapeType = this.shapeArray[shape];
   this.x = x;
+  this.edge = false;
 
   if (this.shapeType === 'triangle') {
     this.y = y-20;
@@ -43,9 +44,17 @@ const Enemy = function (e, x, y, r, shape) {
 
   this.xdir = 10;
 
-  this.shiftDown = function () {
+  this.shiftDown = function (enemyLength) {
+    if (this.x <= 10) {
+      this.y += 50;
+      this.x = 13;
+      console.log('left of screen')
+    } else if (this.x >= e.width) {
+      this.y += 50;
+      this.x = e.width - 3
+      console.log('right of screen')
+    }
     this.xdir *= -1;
-    this.y += 1;
   };
 
   this.show = function (e) {
@@ -79,9 +88,16 @@ const Enemy = function (e, x, y, r, shape) {
     this.toDelete = true;
   };
 
-  this.move = function (e, speed) {
-    if (e.frameCount % speed === 0) {
+  this.move = function (e, newAmount) {
+    let moveSpeed = 0
+    if (newAmount > 24) {
+      moveSpeed = e.round(newAmount/6)
+    } else {
+      moveSpeed = 3
+    }
+    if (e.frameCount % moveSpeed === 0) {
       this.x = this.x + this.xdir;
+
     }
   };
 };

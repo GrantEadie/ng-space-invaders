@@ -3,8 +3,9 @@ import * as p5 from 'p5';
 import Ship from './js/Ship';
 import Enemy from './js/Enemy';
 import Lazer from './js/Lazer';
-import BarrierBlock from './js/BarrierBlock'
+import BarrierBlock from './js/BarrierBlock';
 import GameDrawing from './js/GameDrawing';
+import loadBarriers from './js/LoadBarriers'
 
 @Component({
   selector: 'app-space-invaders',
@@ -22,41 +23,23 @@ export class SpaceInvadersComponent implements OnInit {
     let gameOver = false;
     let ship: any;
     let enemies: any = [];
+    let startingEnemies: number = 60;
     let lazers: any = [];
     let explosion: any = [];
     let enemyShot: any = [];
     let allBarriers: any = [];
     let gameDrawing = new GameDrawing();
 
-    const loadBarriers = function (e: any, placement: number) {
-      let barrier: any = [];
-      for (let i = 0; i < 10; i++) {
-        barrier[i] = new BarrierBlock(((e.width / 4) + placement) - (i * 10), e.height - 200, 10, 10)
-      }
-      for (let j = 10; j < 20; j++) {
-        barrier[j] = new BarrierBlock(((e.width / 4) + placement) - ((j - 10) * 10), e.height - 211, 10, 10)
-      }
-      for (let j = 20; j < 30; j++) {
-        barrier[j] = new BarrierBlock(((e.width / 4) + placement) - ((j - 20) * 10), e.height - 222, 10, 10)
-      }
-      for (let j = 30; j < 40; j++) {
-        barrier[j] = new BarrierBlock(((e.width / 4) + placement) - ((j - 30) * 10), e.height - 233, 10, 10)
-      }
-      for (let j = 40; j < 50; j++) {
-        barrier[j] = new BarrierBlock(((e.width / 4) + placement) - ((j - 40) * 10), e.height - 244, 10, 10)
-      }
-      return barrier
-    }
-
     const loadEnemies = function (e: any, rows: number, amount: number) {
+      const columnAmount = amount/rows
       for (let j = 0; j < rows; j++) {
-        for (let i = 0; i < amount; i++) {
+        for (let i = 0; i < columnAmount; i++) {
           if (j % 2 === 0) {
             // first row
-            enemies[i + (j*amount)] = new Enemy(e, (i*40) + 30, 40 + (60*j), 6, j);
+            enemies[i + (j*columnAmount)] = new Enemy(e, (i*40) + 30, 40 + (60*j), 6, j);
           } else {
             // second row
-            enemies[i + (j*amount)] = new Enemy(e, (i*40) + 20, 40 + (60*j), 6, j);
+            enemies[i + (j*columnAmount)] = new Enemy(e, (i*40) + 20, 40 + (60*j), 6, j);
           }
         }
       }
@@ -64,7 +47,7 @@ export class SpaceInvadersComponent implements OnInit {
 
     const loadGame = function (e: any) {
       ship = new Ship(e);
-      loadEnemies(e, 5, 12);
+      loadEnemies(e, 5, startingEnemies);
       for (let i = 0; i < 4; i++) {
         allBarriers[i] = loadBarriers(e, i * (e.width / 5))
       }
@@ -101,7 +84,7 @@ export class SpaceInvadersComponent implements OnInit {
             gameDrawing.drawMenu(e, allBarriers)
           }
         } else {
-          gameDrawing.drawGame(e, ship, enemies, explosion, enemyShot, lazers, allBarriers)
+          gameDrawing.drawGame(e, ship, enemies, explosion, enemyShot, lazers, allBarriers, startingEnemies)
           if (ship.gameOver) {
             gameOver = true;
             DISPLAY_MENU = true;
@@ -132,7 +115,7 @@ export class SpaceInvadersComponent implements OnInit {
       e.keyPressed = () => {
         if (e.key === ' ') {
           if (e.frameCount - ship.lastLazerFiredTimeStamp > 21) {
-            let lazer: any = new Lazer(e, ship.x + 20, e.height - 40);
+            let lazer: any = new Lazer(e, ship.x + 30, e.height - 40);
             lazers.push(lazer)
             ship.lastLazerFiredTimeStamp = e.frameCount;
           }

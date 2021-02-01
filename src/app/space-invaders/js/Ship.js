@@ -6,7 +6,7 @@ const Ship = function (e) {
   this.xdir = 0;
   this.lazerInterval = 10;
   this.lastLazerFiredTimeStamp = this.lazerInterval;
-  this.w = 40;
+  this.w = 60;
   this.h = 10;
   this.playerLife = 3;
   this.gameOver = false;
@@ -21,11 +21,11 @@ const Ship = function (e) {
     e.strokeWeight(e.random(1, 2));
     e.rect(this.x, this.y, this.w, this.h);
     e.triangle(
-      this.x + 12.5,
+      this.x + 15,
       e.height - 20,
-      this.x + 20,
+      this.x + 30,
       e.height - 27.5,
-      this.x + 27.5,
+      this.x + 45,
       e.height - 20
     );
     e.pop();

@@ -4,6 +4,7 @@ const EnemyShot = function (e, x, y) {
   this.r = 4;
   this.toDelete = false;
   this.secondaryRGB = [255, 255, 0];
+  this.speed = e.random(2, 7)
 
   this.show = function (e) {
     e.noStroke();
@@ -58,7 +59,7 @@ const EnemyShot = function (e, x, y) {
   };
 
   this.move = function (e) {
-    this.y = this.y + 7;
+    this.y = this.y + this.speed;
   };
 };
 
